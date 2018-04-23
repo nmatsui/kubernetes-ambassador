@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dummy-restapi-1
+  labels:
+    service: dummy-restapi-1
+  annotations:
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v0
+      kind: Mapping
+      name: dummy-restapi-1
+      prefix: /api1/
+      service: http://dummy-restapi-1:3000
+spec:
+  type: ClusterIP
+  selector:
+    pod: dummy-restapi-1
+  ports:
+  - name: dummy-restapi-1
+    port: 3000
+    targetPort: 3000
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: dummy-restapi-1
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        pod: dummy-restapi-1
+    spec:
+      containers:
+      - name: hello-world-api
+        image: nmatsui/hello-world-api:latest
+        env:
+        - name: PORT
+          value: "3000"
+        - name: MESSAGE
+          value: "dummy restapi 1"
+        ports:
+          - name: dummy-restapi-1
+            containerPort: 3000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: dummy-restapi-2
+  labels:
+    service: dummy-restapi-2
+  annotations:
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v0
+      kind: Mapping
+      name: dummy-restapi-2
+      prefix: /api2/
+      service: http://dummy-restapi-2:8888
+spec:
+  type: ClusterIP
+  selector:
+    pod: dummy-restapi-2
+  ports:
+  - name: dummy-restapi-2
+    port: 8888
+    targetPort: 8888
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: dummy-restapi-2
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        pod: dummy-restapi-2
+    spec:
+      containers:
+      - name: hello-world-api
+        image: nmatsui/hello-world-api:latest
+        env:
+        - name: PORT
+          value: "8888"
+        - name: MESSAGE
+          value: "dummy restapi 2"
+        ports:
+          - name: dummy-restapi-2
+            containerPort: 8888
